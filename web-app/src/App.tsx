@@ -29,7 +29,6 @@ const App = () => {
     setGameDataInit(prev => ({ ...prev, totalChecked: checkboxDataArray.length, }))
     setCheckedBoxes(payload)
   })
-  console.log('connectionStatus', connectionStatus)
 
   // useSubscribePlayerChannel(updatedCount => {
   //   setGameDataInit(prev => ({ ...prev, playersJoined: updatedCount }))

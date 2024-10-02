@@ -1,8 +1,8 @@
 import { createClient, RealtimePostgresChangesPayload } from "@supabase/supabase-js"
 import { useCallback, useEffect, useState, } from 'react';
 
-const supabaseURL = "https://sovfkmypcfuvpghwtvfj.supabase.co/"
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvdmZrbXlwY2Z1dnBnaHd0dmZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc1MDEyMzMsImV4cCI6MjA0MzA3NzIzM30.2BPv8Ztb2DVASuFbdIY4yxDwF2gnpsS4k0cW39KqLLo";
+const supabaseURL = import.meta.env.VITE_SUPABASE_URL
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANONKEY;
 export const supabase = createClient(supabaseURL, supabaseKey);
 
 const generateSessionId = () => {
@@ -113,8 +113,11 @@ export const useSubscribePlayerChannel = (countUpdateCB: (count: number) => void
     }, [])
 }
 
-export const useCheckboxesUpdate = (checkboxUpdate: (checkboxesSet: Set<number>) => void) => {
-    const [connectionStatus, setConnectionStatus] = useState("loading")
+export const useCheckboxesUpdate = (checkboxUpdate: (checkboxesSet: Set<number>) => void): [
+    (updatedData: Set<number>) => Promise<unknown[] | undefined>,
+    "loading" | "connected" | "connectionError"
+] => {
+    const [connectionStatus, setConnectionStatus] = useState<"loading" | "connected" | "connectionError">("loading")
     const realtimeCheckBoxChannel = useCallback(() => {
         setConnectionStatus("loading")
         const checkBoxChannel = supabase
