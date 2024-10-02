@@ -1,0 +1,28 @@
+.loader-container {
+
+
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+
+    .loaders {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+
+    .checkbox-holder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    input[type="checkbox"] {
+        height: 25px;
+        width: 25px;
+    }
+}

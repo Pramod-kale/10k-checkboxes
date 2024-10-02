@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import './App.css'
 import Header from './components/header'
 import CheckboxContainer from "./components/checkboxes"
 import { VariableSizeGrid as Grid } from 'react-window';
-import { socket } from "./socket.io"
+import { useCheckboxesUpdate } from './util/supabase';
+import Loader from './components/loader';
 
 
 const config = {
@@ -15,18 +16,29 @@ export type TGameInitData = {
   totalChecked: number
 }
 
-function App() {
+const App = () => {
   const gridRef = useRef<Grid>(null);
 
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
   const [checkedBoxes, setCheckedBoxes] = useState<Set<number>>(new Set());
 
-  const [gameInitialData, setGameInitiallData] = useState<TGameInitData | null>(null)
+  const [gameDataInit, setGameDataInit] = useState<TGameInitData>({ playersJoined: 0, totalChecked: 0 })
+
+  const [updateCheckbox, connectionStatus] = useCheckboxesUpdate(payload => {
+    const checkboxDataArray = Array.from(payload)
+    setGameDataInit(prev => ({ ...prev, totalChecked: checkboxDataArray.length, }))
+    setCheckedBoxes(payload)
+  })
+  console.log('connectionStatus', connectionStatus)
+
+  // useSubscribePlayerChannel(updatedCount => {
+  //   setGameDataInit(prev => ({ ...prev, playersJoined: updatedCount }))
+  // })
 
   const handleCheckboxChange = (checkedSet: Set<number>) => {
     setHighlightedIndex(null)
     setCheckedBoxes(checkedSet)
-    socket.emit('checked', Array.from(checkedSet));
+    updateCheckbox(checkedSet)
   }
 
   const scrollToIndex = (index: number) => {
@@ -48,48 +60,27 @@ function App() {
     }
   }
 
-  useEffect(() => {
-
-    socket.on("connect", () => {
-      console.log('connected as ' + socket.id)
-    })
-
-    socket.on("disconnect", () => {
-      console.log('disconneted')
-    })
-
-    socket.on("ready", (data) => {
-      setGameInitiallData(data)
-      setCheckedBoxes(new Set(data.totalChecked))
-    })
-    socket.on("checked", (data) => {
-      const updatedSet = new Set([...checkedBoxes, ...data])
-      setCheckedBoxes(updatedSet as Set<number>)
-    })
-
-    return () => {
-      socket.off("connect")
-      socket.off("disconnect")
-      socket.off("ready")
-      socket.off("checked")
-    }
-
-  }, [checkedBoxes])
   return (
     <div className='main-container'>
       <Header
         jumpToIndex={scrollToIndex}
         totalCheckboxes={config.totalCheckboxes}
         checkedBoxes={checkedBoxes}
-        gameInitialData={gameInitialData as TGameInitData}
+        gameInitialData={gameDataInit as TGameInitData}
       />
-      <CheckboxContainer
-        ref={gridRef}
-        checkBoxesCount={config.totalCheckboxes}
-        handleCheckboxChange={handleCheckboxChange}
-        highlightedIndex={highlightedIndex}
-        checkBoxStateWS={checkedBoxes}
-      />
+      {
+        connectionStatus === "loading"
+          ?
+          <Loader />
+          :
+          <CheckboxContainer
+            ref={gridRef}
+            checkBoxesCount={config.totalCheckboxes}
+            handleCheckboxChange={handleCheckboxChange}
+            highlightedIndex={highlightedIndex}
+            checkBoxStateWS={checkedBoxes}
+          />
+      }
     </div>
   )
 }

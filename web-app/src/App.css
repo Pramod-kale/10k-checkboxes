@@ -1,4 +1,6 @@
 .main-container {
+    container-type: inline-size;
+    container-name: checkbox-container;
     text-align: center;
     height: 95dvh;
     padding: 1rem;
@@ -10,8 +12,25 @@
     align-items: center;
     height: 100px;
 
+    .title-fz {
+        display: none;
+    }
+
     h1 {
         margin: 0;
+    }
+
+    .creator {
+
+        a,
+        a:link a:visited a:active {
+            color: aqua;
+            text-decoration: none;
+        }
+
+        a:hover {
+            border-bottom: 1px solid aqua;
+        }
     }
 
     .progress {
@@ -25,6 +44,141 @@
     }
 }
 
+@container checkbox-container (inline-size < 1100px) {
+    .header-container {
+        h1 {
+            font-size: 1.5rem;
+        }
+
+        .progress .total-count,
+        .title p {
+            font-size: 0.9rem;
+        }
+
+        .creator p,
+        .creator a {
+            font-size: 0.8rem;
+        }
+
+        input[type="number"].jump-to-index {
+            width: 120px;
+            font-size: 0.8rem;
+        }
+    }
+}
+
+@container checkbox-container (inline-size < 920px) {
+    .header-container {
+        h1 {
+            font-size: 1.4rem;
+        }
+
+        .title {
+            width: 50%;
+        }
+
+        .progress .total-count,
+        .title p {
+            font-size: 0.8rem;
+        }
+
+        .creator p,
+        .creator a {
+            font-size: 0.8rem;
+        }
+
+        input[type="number"].jump-to-index {
+            width: 120px;
+            font-size: 0.8rem;
+        }
+    }
+}
+
+@container checkbox-container (inline-size < 600px) {
+    .header-container {
+        flex-wrap: wrap;
+
+        .title {
+            display: none;
+        }
+
+        .title-fz {
+            width: 100%;
+            display: block;
+
+            h1 {
+                font-size: 1.4rem;
+                margin: 0;
+            }
+
+            p {
+                font-size: 0.8rem;
+                margin: 0;
+            }
+        }
+
+        .progress {
+            margin-top: 4px;
+
+            p {
+                margin: 0;
+                margin-top: 4px;
+            }
+        }
+    }
+}
+
+@container checkbox-container (inline-size < 430px) {
+    .header-container {
+        flex-wrap: wrap;
+
+        .title {
+            display: none;
+        }
+
+        .title-fz {
+            width: 100%;
+            display: block;
+
+            h1 {
+                font-size: 1.2rem;
+                margin: 0;
+            }
+
+            p {
+                font-size: 0.6rem;
+                margin: 0;
+            }
+        }
+
+        .progress {
+            margin-top: 4px;
+
+            .total-count {
+                margin: 0;
+                margin-top: 4px;
+                font-size: 0.6rem;
+            }
+        }
+    }
+
+    .creator {
+
+        font-size: 0.6rem;
+
+
+
+    }
+
+    input[type="number"].jump-to-index {
+        width: 120px;
+        font-size: 0.8rem;
+    }
+
+}
+
+
+
 .checkbox-container {
     display: flex;
     justify-content: center;
@@ -34,7 +188,8 @@
     border-top: 3px solid #3B3B3B;
 
     .checkbox-highlight {
-        box-shadow: 0 0 5px 5px #ffffff;
+        border: 1px solid #16A110 !important;
+        border-radius: 2px;
         transition: background-color 0.3s ease;
     }
 

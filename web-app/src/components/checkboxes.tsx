@@ -1,106 +1,109 @@
-import { useEffect, useState, forwardRef } from 'react'
+import { useEffect, useState, forwardRef, useCallback } from 'react';
 import { VariableSizeGrid as Grid } from 'react-window';
-import { generateRandomColor } from '../util/randomColorGen';
-
 
 type Props = {
-    checkBoxesCount: number
+    checkBoxesCount: number;
     handleCheckboxChange: (checkedSet: Set<number>) => void;
     highlightedIndex: number | null;
-    checkBoxStateWS: Set<number>
-}
-//const MyInput = forwardRef(function MyInput(props, ref) {
-console.clear()
+    checkBoxStateWS: Set<number>;
+};
 
+const CheckboxesContainer = forwardRef<Grid, Props>(
+    ({ checkBoxesCount, handleCheckboxChange, highlightedIndex, checkBoxStateWS }: Props, ref) => {
+        const rowHeight = 50;
+        const columnWidth = 50;
+        const totalCheckboxes = checkBoxesCount;
 
-const CheckboxesContainer = forwardRef<Grid, Props>(({ checkBoxesCount, handleCheckboxChange, highlightedIndex, checkBoxStateWS }: Props, ref) => {
+        const [checkedBoxes, setCheckedBoxes] = useState<Set<number>>(new Set());
+        const latestChecked = Array.from(checkedBoxes).slice(-5);
 
-    // constants
-    const rowHeight = 50;
-    const columnWidth = 50;
-    const totalCheckboxes = checkBoxesCount;
-    const [checkedBoxes, setCheckedBoxes] = useState<Set<number>>(new Set());
-    const latestChecked = Array.from(checkedBoxes).slice(-8)
-    const [dimensions, setDimensions] = useState({ height: window.innerHeight - 170, width: window.innerWidth * 0.97 })
-    const [table, setTable] = useState<{ columns: number, rows: number }>({ columns: Math.round((window.innerWidth * 0.97) / columnWidth), rows: totalCheckboxes / Math.round((window.innerWidth * 0.97) / columnWidth) })
+        const [dimensions, setDimensions] = useState({
+            height: window.innerHeight - 170,
+            width: window.innerWidth * 0.97,
+        });
 
+        const calculateTable = useCallback(() => {
+            const columns = Math.floor((window.innerWidth * 0.97) / columnWidth);
+            const rows = Math.ceil(totalCheckboxes / columns);
+            return { columns, rows };
+        }, [totalCheckboxes])
 
-    useEffect(() => {
-        setDimensions({ height: window.innerHeight - 170, width: window.innerWidth * 0.97 })
-        setTable({ columns: Math.round((window.innerWidth * 0.97) / columnWidth), rows: totalCheckboxes / Math.round((window.innerWidth * 0.97) / columnWidth) })
+        const [table, setTable] = useState<{ columns: number; rows: number }>(calculateTable);
 
-        window.addEventListener('resize', () => {
-            setDimensions({ height: window.innerHeight - 170, width: window.innerWidth * 0.97 })
-            setTable({ columns: Math.round((window.innerWidth * 0.97) / columnWidth), rows: totalCheckboxes / Math.round((window.innerWidth * 0.97) / columnWidth) })
-        })
-        return () => {
-            window.removeEventListener('resize', () => {
-                setDimensions({ height: window.innerHeight - 170, width: window.innerWidth * 0.97 })
-                setTable({ columns: Math.round((window.innerWidth * 0.97) / columnWidth), rows: totalCheckboxes / Math.round((window.innerWidth * 0.97) / columnWidth) })
-            })
-        }
-    }, [totalCheckboxes])
+        useEffect(() => {
+            const handleResize = () => {
+                setDimensions({ height: window.innerHeight - 170, width: window.innerWidth * 0.97 });
+                setTable(calculateTable());
+            };
 
-    const onCheckboxChange = (index: number) => {
-        const newChecked = new Set(checkedBoxes);
-        if (newChecked?.has(index)) {
-            newChecked?.delete(index);
-        } else {
-            newChecked?.add(index);
-        }
-        handleCheckboxChange(newChecked)
-        setCheckedBoxes(() => newChecked);
-    };
+            window.addEventListener('resize', handleResize);
+            return () => {
+                window.removeEventListener('resize', handleResize);
+            };
+        }, [calculateTable, totalCheckboxes]);
 
-    useEffect(() => {
-        setCheckedBoxes(checkBoxStateWS)
-    }, [checkBoxStateWS])
+        const onCheckboxChange = (index: number) => {
+            const newChecked = new Set(checkedBoxes);
+            if (newChecked.has(index)) {
+                newChecked.delete(index);
+            } else {
+                newChecked.add(index);
+            }
+            handleCheckboxChange(newChecked);
+            setCheckedBoxes(() => newChecked);
+        };
 
+        useEffect(() => {
+            setCheckedBoxes(checkBoxStateWS);
+        }, [checkBoxStateWS]);
 
-    return (
-        <div className='checkbox-container'>
-            <Grid
-                ref={ref}
-                style={{ margin: "10px auto" }}
-                columnCount={table.columns}
-                rowCount={table.rows}
+        const renderCheckbox = (columnIndex: number, rowIndex: number, style: React.CSSProperties) => {
 
-                columnWidth={() => columnWidth}
-                rowHeight={() => rowHeight}
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { height, width, ...restStyles } = style
+            const index = rowIndex * table.columns + columnIndex;
+            if (index >= totalCheckboxes) return null;
 
-                height={dimensions.height}
-                width={dimensions.width}
-            >
-                {
-                    ({ columnIndex, rowIndex, style }) => {
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        const { height, width, ...rest } = style;
-                        const index = rowIndex * table.columns + columnIndex;
-                        const isChecked = checkedBoxes?.has(index);
-                        const isHighlighted = highlightedIndex === index;
-                        const recentCheckedHighlight = latestChecked.includes(index)
-                        return (
-                            <div
-                                className={`checkbox-holder ${isHighlighted ? 'checkbox-highlight' : ''}`}
-                                style={{
-                                    ...rest,
-                                    boxShadow: recentCheckedHighlight ? `0 0 3px 3px ${generateRandomColor()}` : "none"
-                                }}>
-                                <input
-                                    type="checkbox"
-                                    name=""
-                                    id={"checkbox" + index}
-                                    checked={isChecked}
-                                    onChange={() => onCheckboxChange(index)}
-                                />
-                            </div>
-                        )
-                    }
-                }
-            </Grid>
-        </div>
-    )
-})
+            const isChecked = checkedBoxes.has(index);
+            const isHighlighted = highlightedIndex === index;
+            const recentCheckedHighlight = latestChecked.includes(index);
 
+            return (
+                <div
+                    className={`checkbox-holder ${isHighlighted ? 'checkbox-highlight' : ''}`}
+                    style={{
+                        ...restStyles,
+                        borderRadius: '2px',
+                        border: recentCheckedHighlight ? `1px solid #d5d5d5` : 'none',
+                    }}
+                >
+                    <input
+                        type='checkbox'
+                        id={'checkbox' + index}
+                        checked={isChecked}
+                        onChange={() => onCheckboxChange(index)}
+                    />
+                </div>
+            );
+        };
 
-export default CheckboxesContainer
+        return (
+            <div className='checkbox-container'>
+                <Grid
+                    ref={ref}
+                    style={{ margin: '10px auto' }}
+                    columnCount={table.columns}
+                    rowCount={table.rows}
+                    columnWidth={() => columnWidth}
+                    rowHeight={() => rowHeight}
+                    height={dimensions.height}
+                    width={dimensions.width}
+                >
+                    {({ columnIndex, rowIndex, style }) => renderCheckbox(columnIndex, rowIndex, style)}
+                </Grid>
+            </div>
+        );
+    }
+);
+
+export default CheckboxesContainer;
