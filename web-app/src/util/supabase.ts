@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 import { createClient, RealtimePostgresChangesPayload } from "@supabase/supabase-js"
 import { useCallback, useEffect, useState, } from 'react';
 
