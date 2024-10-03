@@ -111,6 +111,7 @@ export const useSubscribePlayerChannel = (countUpdateCB: (count: number) => void
             window.removeEventListener("beforeunload", handleBeforeUnload)
             window.removeEventListener("offline", handleBeforeUnload)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 }
 
@@ -177,6 +178,7 @@ export const useCheckboxesUpdate = (checkboxUpdate: (checkboxesSet: Set<number>)
         return () => {
             supabase.removeChannel(checkboxChannel)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return [updateCheckbox, connectionStatus]
