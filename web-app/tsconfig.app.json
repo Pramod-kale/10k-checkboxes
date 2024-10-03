@@ -8,23 +8,27 @@
       "DOM.Iterable"
     ],
     "module": "ESNext",
-    "skipLibCheck": true,
+    "skipLibCheck": true, // Skip checking type definitions for libraries
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "bundler", // Vite-specific bundling resolution
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
-    "jsx": "react-jsx",
+    "jsx": "react-jsx", // JSX support for React
     /* Linting */
-    "strict": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noImplicitAny": false,
-    "strictNullChecks": false,
-    "noFallthroughCasesInSwitch": true
+    "strict": true, // Enable strict mode
+    "noUnusedLocals": false, // Ignore warnings for unused local variables
+    "noUnusedParameters": false, // Ignore warnings for unused function parameters
+    "noImplicitAny": false, // Allow implicit 'any' types
+    "strictNullChecks": false, // Disable strict null checking
+    "noFallthroughCasesInSwitch": true // Ensure no fallthrough in switch cases
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "node_modules", // Exclude node_modules from type-checking
+    "dist" // Exclude the build output folder
   ]
 }
