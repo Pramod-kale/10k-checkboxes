@@ -7,14 +7,5 @@
     {
       "path": "./tsconfig.node.json"
     }
-  ],
-  "compilerOptions": {
-    "jsx": "react",
-    "moduleResolution": "node",
-    "types": [
-      "vite/client"
-    ],
-    "noUnusedLocals": false,
-    "noUnusedParameters": false
-  }
+  ]
 }
