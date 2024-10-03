@@ -26,7 +26,7 @@ const Header = ({ jumpToIndex, totalCheckboxes, checkedBoxes, }: Props) => {
                 <p>You check the boxes, they check the boxes everybody check the boxes.</p>
             </div>
             <div className="creator">
-                <p className='link-holder'>Created by <a className='link' href=""> Pramod kale </a></p>
+                <p className='link-holder'>Created by <a className='link' href="https://github.com/Pramod-kale/10k-checkboxes"> Pramod kale </a></p>
             </div>
             <div className="title">
                 <h1>10k Checkboxes</h1>
